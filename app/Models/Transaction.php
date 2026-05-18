@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Transaction extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'total_amount', 'status', 'payment_method', 'payment_code'];
+    protected $fillable = ['user_id', 'total_amount', 'status', 'payment_method', 'payment_code', 'payment_proof'];
 
     public function user()
     {

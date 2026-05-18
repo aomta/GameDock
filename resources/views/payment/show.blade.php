@@ -310,14 +310,27 @@
             <div class="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
             </div>
-            <h3 class="text-lg font-bold text-white mb-1">Confirm Payment</h3>
-            <p class="text-sm text-slate-400">Make sure you have completed the transfer before confirming. Once confirmed, your payment will be queued for verification by our team.</p>
+            <h3 class="text-lg font-bold text-white mb-1">Upload Payment Proof</h3>
+            <p class="text-sm text-slate-400">Upload a screenshot or photo of your payment confirmation (max 5MB).</p>
         </div>
-        <form action="{{ route('payment.verify', $transaction) }}" method="POST">
+        <form action="{{ route('payment.verify', $transaction) }}" method="POST" enctype="multipart/form-data">
             @csrf
+            <div class="mb-5">
+                <label class="flex flex-col items-center gap-3 px-4 py-8 rounded-lg border-2 border-dashed border-white/10 bg-[#0b1b2b] cursor-pointer hover:border-[#4b76c4]/50 transition-colors" id="proof-upload-area">
+                    <svg class="w-10 h-10 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <div class="text-center">
+                        <p class="text-sm font-semibold text-slate-400" id="proof-label">Click to upload payment proof</p>
+                        <p class="text-xs text-slate-600 mt-1">JPG, PNG, or WebP</p>
+                    </div>
+                    <input type="file" name="payment_proof" id="payment_proof" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="document.getElementById('proof-label').textContent = this.files[0]?.name || 'Click to upload payment proof'; document.getElementById('proof-preview').classList.toggle('hidden', !this.files[0])" required>
+                </label>
+                <div id="proof-preview" class="hidden mt-3">
+                    <img id="proof-preview-img" class="w-full h-48 rounded-lg object-contain bg-[#0b1b2b] border border-white/10">
+                </div>
+            </div>
             <div class="flex gap-3">
                 <button type="button" onclick="closeModal('payment-confirm-modal')" class="steam-btn-secondary flex-1">Cancel</button>
-                <button type="submit" class="steam-btn flex-1">Yes, I've Paid</button>
+                <button type="submit" class="steam-btn flex-1">Submit Payment Proof</button>
             </div>
         </form>
     </div>
@@ -337,6 +350,19 @@
 @endif
 
 <script>
+document.getElementById('payment_proof')?.addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            var img = document.getElementById('proof-preview-img');
+            img.src = ev.target.result;
+            document.getElementById('proof-preview').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 function copyCode(code) {
     navigator.clipboard.writeText(code).then(function() {
         var toast = document.createElement('div');

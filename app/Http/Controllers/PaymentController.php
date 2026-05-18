@@ -43,7 +43,7 @@ class PaymentController extends Controller
         return redirect()->route('payment.show', $transaction);
     }
 
-    public function verify(Transaction $transaction): RedirectResponse
+    public function verify(Request $request, Transaction $transaction): RedirectResponse
     {
         abort_unless($transaction->user_id === auth()->id(), 403);
 
@@ -51,8 +51,19 @@ class PaymentController extends Controller
             return redirect()->route('user.my-games')->with('status', 'Payment already completed.');
         }
 
-        $transaction->update(['status' => 'paid']);
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
 
-        return back()->with('status', 'Payment submitted. Waiting for admin confirmation.');
+        $file = $request->file('payment_proof');
+        $filename = 'proof_' . $transaction->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $file->storeAs('public/payments', $filename);
+
+        $transaction->update([
+            'status' => 'paid',
+            'payment_proof' => $filename,
+        ]);
+
+        return back()->with('status', 'Payment proof submitted. Waiting for admin confirmation.');
     }
 }
