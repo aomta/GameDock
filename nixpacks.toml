@@ -1,5 +1,14 @@
 [phases.setup]
-nixPkgs = ["php83", "php83Packages.composer", "nginx", "nodejs_18"]
+nixPkgs = [
+  "php83",
+  "php83Packages.composer",
+  "php83Extensions.zip",
+  "php83Extensions.gd",
+  "php83Extensions.mbstring",
+  "php83Extensions.xml",
+  "nginx",
+  "nodejs_18"
+]
 
 [phases.install]
 cmds = [
@@ -11,4 +20,4 @@ cmds = [
 cmds = ["npm run build"]
 
 [start]
-cmd = "php artisan serve --host=0.0.0.0 --port=$PORT"
+cmd = "php artisan storage:link && php artisan optimize:clear && php artisan serve --host=0.0.0.0 --port=$PORT"
