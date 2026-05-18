@@ -30,5 +30,9 @@
             @endforeach
         </tbody>
     </table>
+    <div style="margin-top: 20px; text-align: right; font-size: 14px;">
+        <strong>Total Revenue (Completed):</strong>
+        Rp {{ number_format($transactions->where('status', 'completed')->sum('total_amount'), 0, ',', '.') }}
+    </div>
 </body>
 </html>
